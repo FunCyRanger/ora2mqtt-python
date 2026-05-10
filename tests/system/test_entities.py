@@ -25,6 +25,16 @@ from custom_components.ora.sensor import (
 from tests.fixtures.api_responses import VEHICLE_STATUS_RESPONSE
 
 
+def create_mock_vehicle(vin="LHG12345678901234"):
+    """Create a mock vehicle."""
+    return Vehicle(
+        vin=vin,
+        brand_name="ORA",
+        app_show_series_name="Funky Cat",
+        vtype="Funky Cat",
+    )
+
+
 def create_mock_coordinator(vin="LHG12345678901234"):
     """Create a mock coordinator with vehicle data."""
     status_data = VEHICLE_STATUS_RESPONSE["data"]
@@ -46,12 +56,7 @@ def create_mock_coordinator(vin="LHG12345678901234"):
         ],
     )
 
-    vehicle = Vehicle(
-        vin=vin,
-        brand_name="ORA",
-        app_show_series_name="Funky Cat",
-        vtype="Funky Cat",
-    )
+    vehicle = create_mock_vehicle(vin)
 
     coordinator = MagicMock()
     coordinator.data = {
@@ -71,7 +76,8 @@ class TestOraSocSensor:
     @pytest.fixture
     def sensor(self):
         coordinator = create_mock_coordinator()
-        return OraSocSensor(coordinator, "LHG12345678901234")
+        vehicle = create_mock_vehicle()
+        return OraSocSensor(coordinator, "LHG12345678901234", vehicle)
 
     def test_native_value(self, sensor):
         """Test SOC value."""
@@ -85,6 +91,15 @@ class TestOraSocSensor:
         """Test device class."""
         assert sensor._attr_device_class == "battery"
 
+    def test_device_info(self, sensor):
+        """Test device_info is set."""
+        assert sensor._attr_device_info is not None
+        assert sensor._attr_device_info["identifiers"] == {("ora", "LHG12345678901234")}
+        assert sensor._attr_device_info["manufacturer"] == "GWM"
+        assert sensor._attr_device_info["model"] == "Funky Cat"
+        assert sensor._attr_device_info["serial_number"] == "LHG12345678901234"
+        assert sensor._attr_device_info["name"] == "Funky Cat"
+
 
 class TestOraRangeSensor:
     """Test Range sensor."""
@@ -92,7 +107,8 @@ class TestOraRangeSensor:
     @pytest.fixture
     def sensor(self):
         coordinator = create_mock_coordinator()
-        return OraRangeSensor(coordinator, "LHG12345678901234")
+        vehicle = create_mock_vehicle()
+        return OraRangeSensor(coordinator, "LHG12345678901234", vehicle)
 
     def test_native_value(self, sensor):
         """Test range value."""
@@ -109,7 +125,8 @@ class TestOraOdometerSensor:
     @pytest.fixture
     def sensor(self):
         coordinator = create_mock_coordinator()
-        return OraOdometerSensor(coordinator, "LHG12345678901234")
+        vehicle = create_mock_vehicle()
+        return OraOdometerSensor(coordinator, "LHG12345678901234", vehicle)
 
     def test_native_value(self, sensor):
         """Test odometer value."""
@@ -122,32 +139,43 @@ class TestOraInteriorTempSensor:
     @pytest.fixture
     def sensor(self):
         coordinator = create_mock_coordinator()
-        return OraInteriorTempSensor(coordinator, "LHG12345678901234")
+        vehicle = create_mock_vehicle()
+        return OraInteriorTempSensor(coordinator, "LHG12345678901234", vehicle)
 
     def test_native_value_divided_by_10(self, sensor):
         """Test temperature is divided by 10."""
-        # API returns 215 (meaning 21.5°C)
         assert sensor.native_value == 21.5
 
 
 class TestOraTirePressureSensor:
     """Test tire pressure sensors."""
 
+    @pytest.fixture
+    def coordinator(self):
+        return create_mock_coordinator()
+
+    @pytest.fixture
+    def vehicle(self):
+        return create_mock_vehicle()
+
     @pytest.mark.parametrize(
-        "position,code",
-        [("FL", 2101001), ("FR", 2101002), ("RL", 2101003), ("RR", 2101004)],
+        "position,code,expected",
+        [
+            ("FL", 2101001, "230"),
+            ("FR", 2101002, "230"),
+            ("RL", 2101003, "235"),
+            ("RR", 2101004, "235"),
+        ],
     )
-    def test_tire_pressure(self, position, code):
+    def test_tire_pressure(self, coordinator, vehicle, position, code, expected):
         """Test tire pressure values."""
-        coordinator = create_mock_coordinator()
-        sensor = OraTirePressureSensor(coordinator, "LHG12345678901234", position, code)
-        assert sensor.native_value == "230"
+        sensor = OraTirePressureSensor(coordinator, "LHG12345678901234", vehicle, position, code)
+        assert sensor.native_value == expected
 
     @pytest.mark.parametrize("position", ["FL", "FR", "RL", "RR"])
-    def test_tire_pressure_unit(self, position):
+    def test_tire_pressure_unit(self, coordinator, vehicle, position):
         """Test tire pressure unit."""
-        coordinator = create_mock_coordinator()
-        sensor = OraTirePressureSensor(coordinator, "LHG12345678901234", position, 2101001)
+        sensor = OraTirePressureSensor(coordinator, "LHG12345678901234", vehicle, position, 2101001)
         assert sensor._attr_native_unit_of_measurement == "kPa"
 
 
@@ -157,13 +185,13 @@ class TestOraAcquisitionTimeSensor:
     @pytest.fixture
     def sensor(self):
         coordinator = create_mock_coordinator()
-        return OraAcquisitionTimeSensor(coordinator, "LHG12345678901234")
+        vehicle = create_mock_vehicle()
+        return OraAcquisitionTimeSensor(coordinator, "LHG12345678901234", vehicle)
 
     def test_native_value_timestamp(self, sensor):
         """Test timestamp conversion."""
         result = sensor.native_value
         assert result is not None
-        # 1704067200000 ms = 2024-01-01 00:00:00 UTC
         assert result.year == 2024
         assert result.month == 1
         assert result.day == 1
@@ -172,34 +200,45 @@ class TestOraAcquisitionTimeSensor:
 class TestBinarySensors:
     """Test binary sensors."""
 
-    def test_ac_sensor_on(self):
+    @pytest.fixture
+    def vehicle(self):
+        return create_mock_vehicle()
+
+    def test_ac_sensor_on(self, vehicle):
         """Test A/C is on."""
         coordinator = create_mock_coordinator()
-        sensor = OraAcBinarySensor(coordinator, "LHG12345678901234")
+        sensor = OraAcBinarySensor(coordinator, "LHG12345678901234", vehicle)
         assert sensor.is_on is True
 
-    def test_lock_sensor_on(self):
+    def test_lock_sensor_on(self, vehicle):
         """Test lock is on (locked)."""
         coordinator = create_mock_coordinator()
-        sensor = OraLockBinarySensor(coordinator, "LHG12345678901234")
+        sensor = OraLockBinarySensor(coordinator, "LHG12345678901234", vehicle)
         assert sensor.is_on is True
 
-    def test_charge_plug_sensor_on(self):
+    def test_charge_plug_sensor_on(self, vehicle):
         """Test charge plug is connected."""
         coordinator = create_mock_coordinator()
-        sensor = OraChargePlugBinarySensor(coordinator, "LHG12345678901234")
+        sensor = OraChargePlugBinarySensor(coordinator, "LHG12345678901234", vehicle)
         assert sensor.is_on is True
 
     @pytest.mark.parametrize(
         "position,code",
         [("FL", 2210001), ("FR", 2210002), ("RL", 2210003), ("RR", 2210004)],
     )
-    def test_window_closed(self, position, code):
+    def test_window_closed(self, vehicle, position, code):
         """Test windows are closed (value=1 means closed)."""
         coordinator = create_mock_coordinator()
-        sensor = OraWindowBinarySensor(coordinator, "LHG12345678901234", position, code)
-        # payload_off = "1", and value is "1", so is_on = False (closed)
+        sensor = OraWindowBinarySensor(coordinator, "LHG12345678901234", vehicle, position, code)
         assert sensor.is_on is False
+
+    def test_binary_sensor_device_info(self, vehicle):
+        """Test binary sensor device_info is set."""
+        coordinator = create_mock_coordinator()
+        sensor = OraAcBinarySensor(coordinator, "LHG12345678901234", vehicle)
+        assert sensor._attr_device_info is not None
+        assert sensor._attr_device_info["identifiers"] == {("ora", "LHG12345678901234")}
+        assert sensor._attr_device_info["manufacturer"] == "GWM"
 
 
 class TestOraDeviceTracker:
@@ -208,7 +247,8 @@ class TestOraDeviceTracker:
     @pytest.fixture
     def tracker(self):
         coordinator = create_mock_coordinator()
-        return OraDeviceTracker(coordinator, "LHG12345678901234", "Funky Cat")
+        vehicle = create_mock_vehicle()
+        return OraDeviceTracker(coordinator, "LHG12345678901234", vehicle)
 
     def test_latitude(self, tracker):
         """Test latitude."""
@@ -229,31 +269,75 @@ class TestOraDeviceTracker:
         assert "acquisition_time" in attrs
         assert "update_time" in attrs
 
+    def test_device_info(self, tracker):
+        """Test device tracker device_info is set."""
+        assert tracker._attr_device_info is not None
+        assert tracker._attr_device_info["identifiers"] == {("ora", "LHG12345678901234")}
+        assert tracker._attr_device_info["manufacturer"] == "GWM"
+        assert tracker._attr_device_info["model"] == "Funky Cat"
+        assert tracker._attr_device_info["name"] == "Funky Cat"
+
 
 class TestEntityWithNoData:
     """Test entities with no data."""
 
-    def test_sensor_with_no_data(self):
+    @pytest.fixture
+    def vehicle(self):
+        return create_mock_vehicle()
+
+    def test_sensor_with_no_data(self, vehicle):
         """Test sensor returns None when no data."""
         coordinator = MagicMock()
         coordinator.data = {}
 
-        sensor = OraSocSensor(coordinator, "LHG12345678901234")
+        sensor = OraSocSensor(coordinator, "LHG12345678901234", vehicle)
         assert sensor.native_value is None
 
-    def test_binary_sensor_with_no_data(self):
+    def test_binary_sensor_with_no_data(self, vehicle):
         """Test binary sensor returns None when no data."""
         coordinator = MagicMock()
         coordinator.data = {}
 
-        sensor = OraAcBinarySensor(coordinator, "LHG12345678901234")
+        sensor = OraAcBinarySensor(coordinator, "LHG12345678901234", vehicle)
         assert sensor.is_on is None
 
-    def test_device_tracker_with_no_data(self):
+    def test_device_tracker_with_no_data(self, vehicle):
         """Test device tracker returns None when no data."""
         coordinator = MagicMock()
         coordinator.data = {}
 
-        tracker = OraDeviceTracker(coordinator, "LHG12345678901234", "Test")
+        tracker = OraDeviceTracker(coordinator, "LHG12345678901234", vehicle)
         assert tracker.latitude is None
         assert tracker.longitude is None
+
+
+class TestDeviceInfoConsistency:
+    """Test that all entities for the same VIN share the same device identifier."""
+
+    def test_all_entities_share_same_device_identifier(self):
+        """All entities should have identical identifiers for the same VIN."""
+        coordinator = create_mock_coordinator()
+        vehicle = create_mock_vehicle()
+        vin = "LHG12345678901234"
+
+        sensor = OraSocSensor(coordinator, vin, vehicle)
+        binary_sensor = OraAcBinarySensor(coordinator, vin, vehicle)
+        tracker = OraDeviceTracker(coordinator, vin, vehicle)
+
+        sensor_id = sensor._attr_device_info["identifiers"]
+        binary_id = binary_sensor._attr_device_info["identifiers"]
+        tracker_id = tracker._attr_device_info["identifiers"]
+
+        assert sensor_id == binary_id == tracker_id == {("ora", vin)}
+
+    def test_device_info_reflects_vehicle_name(self):
+        """Device info name should match vehicle app_show_series_name."""
+        coordinator = create_mock_coordinator()
+        vehicle = create_mock_vehicle()
+        vehicle.app_show_series_name = "My Cool Car"
+        vehicle.vtype = "Cool Cat"
+
+        sensor = OraSocSensor(coordinator, "LHG12345678901234", vehicle)
+        assert sensor._attr_device_info["name"] == "My Cool Car"
+        assert sensor._attr_device_info["model"] == "Cool Cat"
+

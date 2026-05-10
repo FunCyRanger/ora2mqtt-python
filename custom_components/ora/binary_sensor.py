@@ -6,8 +6,10 @@ from homeassistant.components.binary_sensor import (
 )
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
+from .api import Vehicle
 from .coordinator import OraCoordinator
 
 
@@ -27,11 +29,13 @@ async def async_setup_entry(
             return
 
         entities = []
-        for vin in coordinator.data:
+        for vin, data in coordinator.data.items():
             if vin in added_vins:
                 continue
             added_vins.add(vin)
-            entities.extend(create_binary_sensors_for_vehicle(coordinator, vin))
+            entities.extend(
+                create_binary_sensors_for_vehicle(coordinator, vin, data.vehicle)
+            )
 
         if entities:
             async_add_entities(entities)
@@ -51,6 +55,7 @@ class OraBinarySensor(BinarySensorEntity):
         vehicle_vin: str,
         data_code: int,
         name: str,
+        vehicle: Vehicle,
         device_class: BinarySensorDeviceClass | None = None,
         payload_on: str = "1",
         payload_off: str = "0",
@@ -58,11 +63,19 @@ class OraBinarySensor(BinarySensorEntity):
         self._coordinator = coordinator
         self._vehicle_vin = vehicle_vin
         self._data_code = data_code
+        self._vehicle = vehicle
         self._payload_on = payload_on
         self._payload_off = payload_off
         self._attr_device_class = device_class
         self._attr_name = name
         self._attr_unique_id = f"ora_{vehicle_vin}_binary_{data_code}"
+        self._attr_device_info = DeviceInfo(
+            identifiers={("ora", vehicle_vin)},
+            name=vehicle.app_show_series_name or "ORA Vehicle",
+            manufacturer="GWM",
+            model=vehicle.vtype or "ORA Vehicle",
+            serial_number=vehicle_vin,
+        )
 
     @property
     def is_on(self) -> bool | None:
@@ -80,12 +93,15 @@ class OraBinarySensor(BinarySensorEntity):
 class OraAcBinarySensor(OraBinarySensor):
     """A/C binary sensor."""
 
-    def __init__(self, coordinator: OraCoordinator, vin: str):
+    def __init__(
+        self, coordinator: OraCoordinator, vin: str, vehicle: Vehicle
+    ):
         super().__init__(
             coordinator,
             vin,
             2202001,
             "A/C",
+            vehicle,
             device_class=BinarySensorDeviceClass.RUNNING,
         )
 
@@ -93,12 +109,15 @@ class OraAcBinarySensor(OraBinarySensor):
 class OraLockBinarySensor(OraBinarySensor):
     """Lock binary sensor."""
 
-    def __init__(self, coordinator: OraCoordinator, vin: str):
+    def __init__(
+        self, coordinator: OraCoordinator, vin: str, vehicle: Vehicle
+    ):
         super().__init__(
             coordinator,
             vin,
             2208001,
             "Lock",
+            vehicle,
             device_class=BinarySensorDeviceClass.LOCK,
         )
 
@@ -106,12 +125,15 @@ class OraLockBinarySensor(OraBinarySensor):
 class OraChargePlugBinarySensor(OraBinarySensor):
     """Charge plug binary sensor."""
 
-    def __init__(self, coordinator: OraCoordinator, vin: str):
+    def __init__(
+        self, coordinator: OraCoordinator, vin: str, vehicle: Vehicle
+    ):
         super().__init__(
             coordinator,
             vin,
             2042082,
             "Charge Plug",
+            vehicle,
             device_class=BinarySensorDeviceClass.PLUG,
         )
 
@@ -119,12 +141,15 @@ class OraChargePlugBinarySensor(OraBinarySensor):
 class OraChargingActiveBinarySensor(OraBinarySensor):
     """Charging active binary sensor."""
 
-    def __init__(self, coordinator: OraCoordinator, vin: str):
+    def __init__(
+        self, coordinator: OraCoordinator, vin: str, vehicle: Vehicle
+    ):
         super().__init__(
             coordinator,
             vin,
             2041142,
             "Charging Active",
+            vehicle,
             device_class=BinarySensorDeviceClass.HEAT,
         )
 
@@ -132,12 +157,15 @@ class OraChargingActiveBinarySensor(OraBinarySensor):
 class OraAirCirculationBinarySensor(OraBinarySensor):
     """Air circulation binary sensor."""
 
-    def __init__(self, coordinator: OraCoordinator, vin: str):
+    def __init__(
+        self, coordinator: OraCoordinator, vin: str, vehicle: Vehicle
+    ):
         super().__init__(
             coordinator,
             vin,
             2078020,
             "Air Circulation",
+            vehicle,
             device_class=BinarySensorDeviceClass.RUNNING,
         )
 
@@ -145,12 +173,15 @@ class OraAirCirculationBinarySensor(OraBinarySensor):
 class OraDefrosterFrontBinarySensor(OraBinarySensor):
     """Front defroster binary sensor."""
 
-    def __init__(self, coordinator: OraCoordinator, vin: str):
+    def __init__(
+        self, coordinator: OraCoordinator, vin: str, vehicle: Vehicle
+    ):
         super().__init__(
             coordinator,
             vin,
             2222001,
             "Front Defroster",
+            vehicle,
             device_class=BinarySensorDeviceClass.HEAT,
         )
 
@@ -158,12 +189,20 @@ class OraDefrosterFrontBinarySensor(OraBinarySensor):
 class OraWindowBinarySensor(OraBinarySensor):
     """Window binary sensor."""
 
-    def __init__(self, coordinator: OraCoordinator, vin: str, position: str, code: int):
+    def __init__(
+        self,
+        coordinator: OraCoordinator,
+        vin: str,
+        vehicle: Vehicle,
+        position: str,
+        code: int,
+    ):
         super().__init__(
             coordinator,
             vin,
             code,
             f"Window {position}",
+            vehicle,
             device_class=BinarySensorDeviceClass.WINDOW,
             payload_on="3",
             payload_off="1",
@@ -171,18 +210,18 @@ class OraWindowBinarySensor(OraBinarySensor):
 
 
 def create_binary_sensors_for_vehicle(
-    coordinator: OraCoordinator, vin: str
+    coordinator: OraCoordinator, vin: str, vehicle: Vehicle
 ) -> list[BinarySensorEntity]:
     """Create all binary sensor entities for a vehicle."""
     return [
-        OraAcBinarySensor(coordinator, vin),
-        OraLockBinarySensor(coordinator, vin),
-        OraChargePlugBinarySensor(coordinator, vin),
-        OraChargingActiveBinarySensor(coordinator, vin),
-        OraAirCirculationBinarySensor(coordinator, vin),
-        OraDefrosterFrontBinarySensor(coordinator, vin),
-        OraWindowBinarySensor(coordinator, vin, "FL", 2210001),
-        OraWindowBinarySensor(coordinator, vin, "FR", 2210002),
-        OraWindowBinarySensor(coordinator, vin, "RL", 2210003),
-        OraWindowBinarySensor(coordinator, vin, "RR", 2210004),
+        OraAcBinarySensor(coordinator, vin, vehicle),
+        OraLockBinarySensor(coordinator, vin, vehicle),
+        OraChargePlugBinarySensor(coordinator, vin, vehicle),
+        OraChargingActiveBinarySensor(coordinator, vin, vehicle),
+        OraAirCirculationBinarySensor(coordinator, vin, vehicle),
+        OraDefrosterFrontBinarySensor(coordinator, vin, vehicle),
+        OraWindowBinarySensor(coordinator, vin, vehicle, "FL", 2210001),
+        OraWindowBinarySensor(coordinator, vin, vehicle, "FR", 2210002),
+        OraWindowBinarySensor(coordinator, vin, vehicle, "RL", 2210003),
+        OraWindowBinarySensor(coordinator, vin, vehicle, "RR", 2210004),
     ]

@@ -3,6 +3,7 @@
 from homeassistant.components.device_tracker import TrackerEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .coordinator import OraCoordinator
@@ -24,17 +25,11 @@ async def async_setup_entry(
             return
 
         entities = []
-        for vin in coordinator.data:
+        for vin, data in coordinator.data.items():
             if vin in added_vins:
                 continue
-            data = coordinator.data.get(vin)
-            if data:
-                added_vins.add(vin)
-                entities.append(
-                    create_device_tracker_for_vehicle(
-                        coordinator, vin, data.vehicle.app_show_series_name or "ORA Vehicle"
-                    )
-                )
+            added_vins.add(vin)
+            entities.append(create_device_tracker_for_vehicle(coordinator, vin, data.vehicle))
 
         if entities:
             async_add_entities(entities)
@@ -48,11 +43,19 @@ async def async_setup_entry(
 class OraDeviceTracker(TrackerEntity):
     """Device tracker for ORA vehicle."""
 
-    def __init__(self, coordinator: OraCoordinator, vin: str, name: str):
+    def __init__(self, coordinator: OraCoordinator, vin: str, vehicle):
         self._coordinator = coordinator
         self._vin = vin
-        self._attr_name = name
+        self._vehicle = vehicle
+        self._attr_name = vehicle.app_show_series_name or "ORA Vehicle"
         self._attr_unique_id = f"ora_{vin}_tracker"
+        self._attr_device_info = DeviceInfo(
+            identifiers={("ora", vin)},
+            name=vehicle.app_show_series_name or "ORA Vehicle",
+            manufacturer="GWM",
+            model=vehicle.vtype or "ORA Vehicle",
+            serial_number=vin,
+        )
 
     @property
     def latitude(self) -> float | None:
@@ -90,8 +93,6 @@ class OraDeviceTracker(TrackerEntity):
         }
 
 
-def create_device_tracker_for_vehicle(
-    coordinator: OraCoordinator, vin: str, name: str
-) -> OraDeviceTracker:
+def create_device_tracker_for_vehicle(coordinator: OraCoordinator, vin: str, vehicle) -> OraDeviceTracker:
     """Create device tracker for a vehicle."""
-    return OraDeviceTracker(coordinator, vin, name)
+    return OraDeviceTracker(coordinator, vin, vehicle)

@@ -26,7 +26,7 @@ DATA_POINTS = {
     2210001: ("window_fl", None, "Window FL"),
     2210002: ("window_fr", None, "Window FR"),
     2210003: ("window_rl", None, "Window RL"),
-    2210004: ("window_rr", "°C", "Window RR"),
+    2210004: ("window_rr", None, "Window RR"),
     2222001: ("defroster_front", None, "Front Defroster"),
     2042082: ("charge_plug", None, "Charge Plug"),
 }
