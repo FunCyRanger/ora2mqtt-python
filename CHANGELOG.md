@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [1.0.4] - 2026-05-10
+
+### Added
+
+- **Charging Time Remaining sensor**: Added `OraChargingTimeSensor` (code 2013022) — shows remaining charging time in minutes.
+- **SOC Target sensor**: Added `OraSocTargetSensor` (code 2013023) — shows the target SOC percentage for charging.
+
+---
+
 ## [1.0.3] - 2026-05-10
 
 ### Fixed

@@ -4,7 +4,7 @@
   "documentation": "https://github.com/FunCyRanger/ora2mqtt-python",
   "issue_tracker": "https://github.com/FunCyRanger/ora2mqtt-python/issues",
   "codeowners": ["@FunCyRanger"],
-  "version": "1.0.3",
+  "version": "1.0.4",
   "requirements": ["aiohttp", "paho-mqtt", "pycryptodome"],
   "dependencies": ["mqtt"],
   "config_flow": true,
