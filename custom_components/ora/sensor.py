@@ -160,6 +160,41 @@ class OraSoceSensor(OraSensor):
         )
 
 
+class OraChargingTimeSensor(OraSensor):
+    """Charging time remaining sensor."""
+
+    def __init__(
+        self, coordinator: OraCoordinator, vin: str, vehicle: Vehicle
+    ):
+        super().__init__(
+            coordinator,
+            vin,
+            2013022,
+            "Charging Time Remaining",
+            vehicle,
+            unit="min",
+            state_class=SensorStateClass.MEASUREMENT,
+        )
+
+
+class OraSocTargetSensor(OraSensor):
+    """SOC target sensor."""
+
+    def __init__(
+        self, coordinator: OraCoordinator, vin: str, vehicle: Vehicle
+    ):
+        super().__init__(
+            coordinator,
+            vin,
+            2013023,
+            "SOC Target",
+            vehicle,
+            device_class=SensorDeviceClass.BATTERY,
+            unit="%",
+            state_class=SensorStateClass.MEASUREMENT,
+        )
+
+
 class OraInteriorTempSensor(OraSensor):
     """Interior temperature sensor."""
 
@@ -273,6 +308,8 @@ def create_sensors_for_vehicle(
     """Create all sensor entities for a vehicle."""
     return [
         OraSocSensor(coordinator, vin, vehicle),
+        OraChargingTimeSensor(coordinator, vin, vehicle),
+        OraSocTargetSensor(coordinator, vin, vehicle),
         OraRangeSensor(coordinator, vin, vehicle),
         OraOdometerSensor(coordinator, vin, vehicle),
         OraSoceSensor(coordinator, vin, vehicle),

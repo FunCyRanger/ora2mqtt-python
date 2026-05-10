@@ -16,10 +16,12 @@ from custom_components.ora.coordinator import VehicleData
 from custom_components.ora.device_tracker import OraDeviceTracker
 from custom_components.ora.sensor import (
     OraAcquisitionTimeSensor,
+    OraChargingTimeSensor,
     OraInteriorTempSensor,
     OraOdometerSensor,
     OraRangeSensor,
     OraSocSensor,
+    OraSocTargetSensor,
     OraTirePressureSensor,
 )
 from tests.fixtures.api_responses import VEHICLE_STATUS_RESPONSE
@@ -117,6 +119,46 @@ class TestOraRangeSensor:
     def test_unit(self, sensor):
         """Test unit."""
         assert sensor._attr_native_unit_of_measurement == "km"
+
+
+class TestOraChargingTimeSensor:
+    """Test Charging Time Remaining sensor."""
+
+    @pytest.fixture
+    def sensor(self):
+        coordinator = create_mock_coordinator()
+        vehicle = create_mock_vehicle()
+        return OraChargingTimeSensor(coordinator, "LHG12345678901234", vehicle)
+
+    def test_native_value(self, sensor):
+        """Test charging time value."""
+        assert sensor.native_value == "30"
+
+    def test_unit(self, sensor):
+        """Test unit."""
+        assert sensor._attr_native_unit_of_measurement == "min"
+
+
+class TestOraSocTargetSensor:
+    """Test SOC Target sensor."""
+
+    @pytest.fixture
+    def sensor(self):
+        coordinator = create_mock_coordinator()
+        vehicle = create_mock_vehicle()
+        return OraSocTargetSensor(coordinator, "LHG12345678901234", vehicle)
+
+    def test_native_value(self, sensor):
+        """Test SOC target value."""
+        assert sensor.native_value == "80"
+
+    def test_device_class(self, sensor):
+        """Test device class."""
+        assert sensor._attr_device_class == "battery"
+
+    def test_unit(self, sensor):
+        """Test unit."""
+        assert sensor._attr_native_unit_of_measurement == "%"
 
 
 class TestOraOdometerSensor:

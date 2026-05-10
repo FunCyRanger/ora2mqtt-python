@@ -137,6 +137,8 @@ def get_expected_sensors() -> list[dict]:
     """Return expected sensor configurations."""
     return [
         {"code": 2013021, "name": "SOC", "unit": "%", "device_class": "battery"},
+        {"code": 2013022, "name": "Charging Time Remaining", "unit": "min", "device_class": None},
+        {"code": 2013023, "name": "SOC Target", "unit": "%", "device_class": "battery"},
         {"code": 2011501, "name": "Range", "unit": "km", "device_class": "distance"},
         {"code": 2103010, "name": "Odometer", "unit": "km", "device_class": "distance"},
         {"code": 2041301, "name": "SOCE", "unit": "%", "device_class": None},

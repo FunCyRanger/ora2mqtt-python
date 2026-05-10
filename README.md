@@ -6,7 +6,7 @@ Based on the original work by [zivillian](https://github.com/zivillian/ora2mqtt)
 
 ## Features
 
-- **Sensors**: SOC (State of Charge), Range, SOCE, Odometer, Tire pressures (4x), Tire temperatures (4x), Interior temperature, Acquisition time
+- **Sensors**: SOC (State of Charge), Charging Time Remaining, SOC Target, Range, SOCE, Odometer, Tire pressures (4x), Tire temperatures (4x), Interior temperature, Acquisition time
 - **Binary Sensors**: A/C, Lock, Windows (4x), Charge plug, Air circulation, Front defroster
 - **Device Tracker**: GPS location
 - **Privacy-aware logging**: All sensitive data is masked in logs
