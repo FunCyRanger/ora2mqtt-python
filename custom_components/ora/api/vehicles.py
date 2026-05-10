@@ -19,6 +19,7 @@ class Vehicle:
     app_show_series_name: str
     vtype: str
     device_id: str | None = None
+    showed_vin: str | None = None
 
 
 @dataclass
@@ -83,6 +84,7 @@ class GwmVehicleClient:
                     app_show_series_name=v.get("appShowSeriesName", ""),
                     vtype=v.get("vtype", ""),
                     device_id=v.get("deviceId"),
+                    showed_vin=v.get("showedVin"),
                 )
             )
         _LOGGER.info("ORA: acquire_vehicles found %d vehicle(s)", len(vehicles))

@@ -54,7 +54,7 @@ class OraDeviceTracker(TrackerEntity):
             name=vehicle.app_show_series_name or "ORA Vehicle",
             manufacturer="GWM",
             model=vehicle.vtype or "ORA Vehicle",
-            serial_number=vin,
+            serial_number=vehicle.showed_vin or vin,
         )
 
     @property

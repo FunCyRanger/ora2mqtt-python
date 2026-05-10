@@ -62,6 +62,7 @@ VEHICLES_RESPONSE = {
             "appShowSeriesName": "Funky Cat",
             "vtype": "Funky Cat",
             "deviceId": "device_001",
+            "showedVin": "LHG12345678901234",
         },
         {
             "vin": "LHG98765432109876",
@@ -69,6 +70,7 @@ VEHICLES_RESPONSE = {
             "appShowSeriesName": "Funky Cat",
             "vtype": "Funky Cat",
             "deviceId": "device_002",
+            "showedVin": "LHG98765432109876",
         },
     ],
 }
