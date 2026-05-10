@@ -1,0 +1,22 @@
+{
+  "domain": "ora",
+  "name": "GWM ORA",
+  "documentation": "https://github.com/FunCyRanger/ora2mqtt-python",
+  "issue_tracker": "https://github.com/FunCyRanger/ora2mqtt-python/issues",
+  "codeowners": ["@FunCyRanger"],
+  "version": "1.0.0",
+  "requirements": ["aiohttp", "paho-mqtt", "pycryptodome"],
+  "dependencies": ["mqtt"],
+  "config_flow": true,
+  "iot_class": "cloud_polling",
+  "integration_type": "device",
+  "log_levels": {
+    "custom_components.ora": "info",
+    "custom_components.ora.api": "info",
+    "custom_components.ora.api.client": "info",
+    "custom_components.ora.api.auth": "info",
+    "custom_components.ora.api.vehicles": "info",
+    "custom_components.ora.coordinator": "info",
+    "custom_components.ora.config_flow": "info"
+  }
+}
