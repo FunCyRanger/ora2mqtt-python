@@ -63,6 +63,7 @@ VEHICLES_RESPONSE = {
             "vtype": "Funky Cat",
             "deviceId": "device_001",
             "showedVin": "LHG12345678901234",
+            "colorUrl": "https://eu-cdn-tsp.gwmcloud.com/files/bt-operation-dashboard/1668670746750.png",
         },
         {
             "vin": "LHG98765432109876",
@@ -71,6 +72,7 @@ VEHICLES_RESPONSE = {
             "vtype": "Funky Cat",
             "deviceId": "device_002",
             "showedVin": "LHG98765432109876",
+            "colorUrl": "https://eu-cdn-tsp.gwmcloud.com/files/bt-operation-dashboard/1668670746751.png",
         },
     ],
 }

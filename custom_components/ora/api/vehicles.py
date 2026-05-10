@@ -20,6 +20,7 @@ class Vehicle:
     vtype: str
     device_id: str | None = None
     showed_vin: str | None = None
+    color_url: str | None = None
 
 
 @dataclass
@@ -85,6 +86,7 @@ class GwmVehicleClient:
                     vtype=v.get("vtype", ""),
                     device_id=v.get("deviceId"),
                     showed_vin=v.get("showedVin"),
+                    color_url=v.get("colorUrl"),
                 )
             )
         _LOGGER.info("ORA: acquire_vehicles found %d vehicle(s)", len(vehicles))

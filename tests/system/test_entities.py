@@ -27,13 +27,14 @@ from custom_components.ora.sensor import (
 from tests.fixtures.api_responses import VEHICLE_STATUS_RESPONSE
 
 
-def create_mock_vehicle(vin="LHG12345678901234"):
+def create_mock_vehicle(vin="LHG12345678901234", color_url=None):
     """Create a mock vehicle."""
     return Vehicle(
         vin=vin,
         brand_name="ORA",
         app_show_series_name="Funky Cat",
         vtype="Funky Cat",
+        color_url=color_url,
     )
 
 
@@ -310,6 +311,23 @@ class TestOraDeviceTracker:
         assert attrs["vin"] == "LHG12345678901234"
         assert "acquisition_time" in attrs
         assert "update_time" in attrs
+        assert "image_url" in attrs
+
+    def test_extra_state_attributes_with_color_url(self):
+        """Test image_url is populated when color_url is available."""
+        coordinator = create_mock_coordinator()
+        vehicle = create_mock_vehicle(color_url="https://eu-cdn-tsp.gwmcloud.com/files/bt-operation-dashboard/1668670746750.png")
+        tracker = OraDeviceTracker(coordinator, "LHG12345678901234", vehicle)
+        attrs = tracker.extra_state_attributes
+        assert attrs["image_url"] == "https://eu-cdn-tsp.gwmcloud.com/files/bt-operation-dashboard/1668670746750.png"
+
+    def test_extra_state_attributes_without_color_url(self):
+        """Test image_url is None when color_url is not available."""
+        coordinator = create_mock_coordinator()
+        vehicle = create_mock_vehicle(color_url=None)
+        tracker = OraDeviceTracker(coordinator, "LHG12345678901234", vehicle)
+        attrs = tracker.extra_state_attributes
+        assert attrs["image_url"] is None
 
     def test_device_info(self, tracker):
         """Test device tracker device_info is set."""

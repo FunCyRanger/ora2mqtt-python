@@ -90,6 +90,7 @@ class OraDeviceTracker(TrackerEntity):
             "device_id": data.status.device_id,
             "acquisition_time": data.status.acquisition_time,
             "update_time": data.status.update_time,
+            "image_url": self._vehicle.color_url,
         }
 
 
