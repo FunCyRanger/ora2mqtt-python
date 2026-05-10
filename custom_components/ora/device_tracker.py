@@ -49,6 +49,7 @@ class OraDeviceTracker(TrackerEntity):
         self._vehicle = vehicle
         self._attr_name = vehicle.app_show_series_name or "ORA Vehicle"
         self._attr_unique_id = f"ora_{vin}_tracker"
+        self._attr_entity_picture = vehicle.color_url
         self._attr_device_info = DeviceInfo(
             identifiers={("ora", vin)},
             name=vehicle.app_show_series_name or "ORA Vehicle",

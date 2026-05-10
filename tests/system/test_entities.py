@@ -313,6 +313,20 @@ class TestOraDeviceTracker:
         assert "update_time" in attrs
         assert "image_url" in attrs
 
+    def test_entity_picture(self):
+        """Test entity_picture is set from color_url."""
+        coordinator = create_mock_coordinator()
+        vehicle = create_mock_vehicle(color_url="https://eu-cdn-tsp.gwmcloud.com/files/bt-operation-dashboard/1668670746750.png")
+        tracker = OraDeviceTracker(coordinator, "LHG12345678901234", vehicle)
+        assert tracker._attr_entity_picture == "https://eu-cdn-tsp.gwmcloud.com/files/bt-operation-dashboard/1668670746750.png"
+
+    def test_entity_picture_none_without_color_url(self):
+        """Test entity_picture is None when color_url is not set."""
+        coordinator = create_mock_coordinator()
+        vehicle = create_mock_vehicle(color_url=None)
+        tracker = OraDeviceTracker(coordinator, "LHG12345678901234", vehicle)
+        assert tracker._attr_entity_picture is None
+
     def test_extra_state_attributes_with_color_url(self):
         """Test image_url is populated when color_url is available."""
         coordinator = create_mock_coordinator()
