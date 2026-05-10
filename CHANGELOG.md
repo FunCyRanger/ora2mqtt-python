@@ -4,6 +4,23 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [1.0.2] - 2026-05-10
+
+### Added
+
+- **Device grouping in Home Assistant UI**: All entities (sensors, binary sensors, device tracker) now set `_attr_device_info` with GWM manufacturer, vehicle name, model, and VIN as identifier. Entities are properly grouped under a single Device card in HA.
+- **New device_info tests**: Added 35 tests covering device_info on all entity types, consistency checks across sensors/binary sensors/tracker for the same VIN, and vehicle name reflection.
+
+### Fixed
+
+- **window_rr unit**: Fixed `°C` → `None` in DATA_POINTS (was incorrectly set for a binary sensor).
+
+### Changed
+
+- Thread `vehicle` object through entity factory functions for access to vehicle metadata.
+
+---
+
 ## [1.0.0] - 2026-05-10
 
 ### Added
