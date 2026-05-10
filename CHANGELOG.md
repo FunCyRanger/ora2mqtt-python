@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [1.0.3] - 2026-05-10
+
+### Fixed
+
+- **Device card serial number**: Use `showedVin` from the GWM API as the serial number in Home Assistant's device card, instead of the raw `vin` field. The `showedVin` is the VIN displayed in the OEM app and is the correct value users expect to see. Fallback to raw `vin` if `showedVin` is null.
+
+---
+
 ## [1.0.2] - 2026-05-10
 
 ### Added
