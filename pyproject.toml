@@ -1,7 +1,7 @@
 [project]
 name = "ora"
 version = "1.0.0"
-requires_python = ">=3.12"
+requires_python = ">=3.14.2"
 authors = [{name = "FunCyRanger"}]
 dependencies = [
     "aiohttp>=3.10.0",
