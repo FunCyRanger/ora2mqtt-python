@@ -47,10 +47,6 @@ BINARY_SENSORS = {
 
 DEFAULT_POLL_INTERVAL = 60
 
-# MQTT topics
-CONF_MQTT_PREFIX = "ora"
-CONF_MQTT_TOPIC = "homeassistant_discovery"
-
 CONF_ACCOUNT = "account"
 CONF_ACCOUNT_COUNTRY = "country"
 CONF_ACCOUNT_EMAIL = "email"

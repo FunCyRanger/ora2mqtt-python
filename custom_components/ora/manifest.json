@@ -5,7 +5,7 @@
   "issue_tracker": "https://github.com/FunCyRanger/ora2mqtt-python/issues",
   "codeowners": ["@FunCyRanger"],
   "version": "1.0.6",
-  "requirements": ["aiohttp", "paho-mqtt", "pycryptodome"],
+  "requirements": ["aiohttp", "pycryptodome"],
   "dependencies": ["mqtt"],
   "config_flow": true,
   "iot_class": "cloud_polling",
