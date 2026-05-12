@@ -11,7 +11,6 @@ from .auth import (
 from .cert import CertificateHandler
 from .client import GwmApiException, GwmHttpClient
 from .vehicles import (
-    Country,
     GwmVehicleClient,
     RemoteCtrlResult,
     Vehicle,
@@ -33,7 +32,6 @@ __all__ = [
     "Vehicle",
     "VehicleStatus",
     "VehicleStatusItem",
-    "Country",
     "RemoteCtrlResult",
 ]
 

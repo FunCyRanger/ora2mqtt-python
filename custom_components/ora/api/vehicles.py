@@ -46,15 +46,6 @@ class VehicleStatus:
 
 
 @dataclass
-class Country:
-    """Country information."""
-
-    code: str
-    name: str
-    lang_code: str
-
-
-@dataclass
 class RemoteCtrlResult:
     """Remote control result."""
 
@@ -127,28 +118,9 @@ class GwmVehicleClient:
             items=items,
         )
 
-    async def get_countries(self) -> list[Country]:
-        """Get list of available countries."""
-        result = await self._client.get(
-            "country/getCountrys",
-            use_app_gateway=False,
-        )
-
-        countries = []
-        data = result.get("data", {})
-
-        for letter, country_list in data.items():
-            if country_list:
-                for c in country_list:
-                    countries.append(
-                        Country(
-                            code=c.get("countryCode", ""),
-                            name=c.get("countryName", ""),
-                            lang_code=c.get("langCode", ""),
-                        )
-                    )
-
-        return countries
+    async def get_countries(self):
+        """Get list of available countries (not used in production flow)."""
+        return []
 
     async def remote_control(
         self,

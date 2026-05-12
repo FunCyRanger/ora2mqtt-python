@@ -1,15 +1,10 @@
 """Authentication methods for GWM API."""
 
-import hashlib
 import logging
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
 
 from ..privacy import mask_privacy_string
 from .client import GwmHttpClient
-
-if TYPE_CHECKING:
-    pass
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -41,22 +36,6 @@ class CustomerServicePhone:
 
     phone: str
     country_code: str
-
-
-@dataclass
-class Country:
-    """Country information."""
-
-    code: str
-    name: str
-    lang_code: str
-
-
-@dataclass
-class Countrys:
-    """List of countries."""
-
-    countries: list[Country]
 
 
 class GwmAuthClient:
@@ -94,23 +73,6 @@ class GwmAuthClient:
             {
                 "email": email,
                 "scenario": 0,
-                "type": 3,
-            },
-            include_token=False,
-        )
-
-    async def send_email_code(
-        self,
-        email: str,
-        scenario: int = 0,
-    ) -> None:
-        """Send email verification code."""
-        _LOGGER.info("ORA: send_email_code email=%s scenario=%s", mask_privacy_string(email), scenario)
-        await self._client.post(
-            "userAuth/getSMSCode",
-            {
-                "email": email,
-                "scenario": scenario,
                 "type": 3,
             },
             include_token=False,
@@ -296,27 +258,3 @@ class GwmAuthClient:
             phone=data.get("phone", ""),
             country_code=data.get("countryCode", ""),
         )
-
-    def _hash_pin(self, pin: str) -> str:
-        """Hash PIN using MD5 (as required by GWM API)."""
-        md5 = hashlib.md5(pin.encode("ascii"))
-        return md5.hexdigest().lower()
-
-    async def check_security_password(self, pin: str) -> bool:
-        """Check if security password (PIN) is correct.
-
-        Returns True if PIN is correct, False otherwise.
-        Used for verifying PIN before remote commands.
-        """
-        _LOGGER.info("ORA: check_security_password")
-        hashed_pin = self._hash_pin(pin)
-        result = await self._client.post(
-            "userAuth/checkSecurityPassword",
-            {
-                "securityPassword": hashed_pin,
-                "type": "2",
-            },
-        )
-
-        data = result.get("data", {})
-        return data.get("isTrue", False)

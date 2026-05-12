@@ -7,7 +7,6 @@ import ssl
 import tempfile
 from dataclasses import dataclass
 from functools import partial
-from typing import Any
 
 import aiohttp
 from cryptography.hazmat.primitives import serialization
@@ -26,15 +25,6 @@ class GwmApiException(Exception):
         self.code = code
         self.message = message
         super().__init__(f"{code}: {message}")
-
-
-@dataclass
-class GwmResponse:
-    """GWM API response wrapper."""
-
-    code: str
-    description: str
-    data: Any = None
 
 
 class GwmHttpClient:

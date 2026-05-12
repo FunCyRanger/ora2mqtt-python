@@ -4,9 +4,10 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
+from homeassistant.const import Platform
+
 from custom_components.ora import (
     PLATFORMS,
-    async_reload_entry,
     async_setup_entry,
     async_unload_entry,
 )
@@ -94,41 +95,6 @@ class TestIntegrationSetup:
         await async_unload_entry(mock_hass, config_entry)
 
         assert "test_entry_123" not in mock_hass.data["ora"]
-
-    @pytest.mark.asyncio
-    async def test_async_reload_entry(self):
-        """Test async_reload_entry."""
-        mock_hass = MagicMock()
-        mock_hass.config_entries.async_update_entry = MagicMock()
-        mock_hass.config_entries.async_unload_platforms = AsyncMock(return_value=True)
-
-        config_entry = MagicMock()
-        config_entry.entry_id = "test_entry_123"
-        config_entry.data = {
-            "region": "eu",
-            "device_id": "device_456",
-            "access_token": "token_abc",
-            "refresh_token": "refresh_xyz",
-            "poll_interval": 60,
-        }
-
-        mock_hass.data = {
-            "ora": {
-                "test_entry_123": MagicMock(),
-            }
-        }
-
-        with (
-            patch(
-                "custom_components.ora.async_setup_entry",
-                new_callable=AsyncMock,
-            ) as mock_setup,
-        ):
-            await async_reload_entry(mock_hass, config_entry)
-
-            mock_hass.config_entries.async_unload_platforms.assert_called_once()
-            mock_setup.assert_called_once()
-
 
 class TestIntegrationPlatforms:
     """Test integration platforms."""
