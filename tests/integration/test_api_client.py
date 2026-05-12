@@ -297,8 +297,8 @@ class TestGwmHttpClient:
         assert client._region == "eu"
         assert client._access_token is None
         assert client._country == "DE"
-        assert "eu-h5-gateway.gwmcloud.com" in client._h5_base
-        assert "eu-app-gateway.gwmcloud.com" in client._app_base
+        assert client._h5_base == "https://eu-h5-gateway.gwmcloud.com/app-api/api/v1.0/"
+        assert client._app_base == "https://eu-app-gateway.gwmcloud.com/app-api/api/v1.0/"
 
     def test_set_access_token(self, client):
         """Test setting access token."""

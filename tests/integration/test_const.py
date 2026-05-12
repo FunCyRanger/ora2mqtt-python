@@ -148,7 +148,7 @@ class TestRegions:
         eu = REGIONS["eu"]
         assert eu["h5_gateway"] == "eu-h5-gateway.gwmcloud.com"
         assert eu["app_gateway"] == "eu-app-gateway.gwmcloud.com"
-        assert ".gwmcloud.com" in eu["h5_gateway"]
+        assert eu["h5_gateway"] == "eu-h5-gateway.gwmcloud.com"
 
 
 class TestDataPointCoverage:
