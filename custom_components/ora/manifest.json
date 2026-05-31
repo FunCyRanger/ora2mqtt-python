@@ -9,5 +9,5 @@
   "dependencies": ["mqtt"],
   "config_flow": true,
   "iot_class": "cloud_polling",
-  "integration_type": "device",
+  "integration_type": "device"
 }
