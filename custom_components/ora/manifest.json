@@ -1,13 +1,13 @@
 {
   "domain": "ora",
   "name": "GWM ORA",
-  "documentation": "https://github.com/FunCyRanger/ora2mqtt-python",
-  "issue_tracker": "https://github.com/FunCyRanger/ora2mqtt-python/issues",
   "codeowners": ["@FunCyRanger"],
-  "version": "1.1.2",
-  "requirements": ["aiohttp"],
-  "dependencies": ["mqtt"],
   "config_flow": true,
+  "dependencies": ["mqtt"],
+  "documentation": "https://github.com/FunCyRanger/ora2mqtt-python",
+  "integration_type": "device",
   "iot_class": "cloud_polling",
-  "integration_type": "device"
+  "issue_tracker": "https://github.com/FunCyRanger/ora2mqtt-python/issues",
+  "requirements": ["aiohttp"],
+  "version": "1.1.2"
 }
