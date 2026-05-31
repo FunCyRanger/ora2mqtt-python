@@ -10,13 +10,4 @@
   "config_flow": true,
   "iot_class": "cloud_polling",
   "integration_type": "device",
-  "log_levels": {
-    "custom_components.ora": "info",
-    "custom_components.ora.api": "info",
-    "custom_components.ora.api.client": "info",
-    "custom_components.ora.api.auth": "info",
-    "custom_components.ora.api.vehicles": "info",
-    "custom_components.ora.coordinator": "info",
-    "custom_components.ora.config_flow": "info"
-  }
 }
